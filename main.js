@@ -4,7 +4,7 @@ const width = 900 - margin.left - margin.right;
 const height = 400 - margin.top - margin.bottom;
 
 // Create SVG containers for both charts
-const svg1_RENAME = d3.select("#lineChart1") // If you change this ID, you must change it in index.html too
+const svgRon = d3.select("#lineChart1") // If you change this ID, you must change it in index.html too
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -22,8 +22,13 @@ const svg2_RENAME = d3.select("#lineChart2")
 // const tooltip = ...
 
 // 2.a: LOAD...
-d3.csv("YOUR_CSV_NAME.csv").then(data => {
+d3.csv("weather.csv").then(data => {
     // 2.b: ... AND TRANSFORM DATA
+    const parseDate = d3.timeParse("%m/%d/%Y"); //turns the date string into a date object
+    data.forEach(d => {
+        d.date = parseDate(d.date);
+        d.actual_mean_temp = +d.actual_mean_temp;
+    });
 
     // 3.a: SET SCALES FOR CHART 1
 
