@@ -30,6 +30,17 @@ d3.csv("weather.csv").then(data => {
         d.actual_mean_temp = +d.actual_mean_temp;
     });
 
+    //group cities together
+    const cities = d3.group(data, d => d.city);
+
+    //rollup the data to group by date and then by city
+    const citiesRollup = d3.rollup(data, 
+        v => v.map(d => d.actual_mean_temp), 
+        d => d.date, 
+        d => d.city, 
+    );
+    console.log("Full Categories Map:", citiesRollup);
+
     // 3.a: SET SCALES FOR CHART 1
 
 
