@@ -11,7 +11,7 @@ const svgRon = d3.select("#lineChart1") // If you change this ID, you must chang
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-const svg2_RENAME = d3.select("#lineChart2")
+const svgElianna = d3.select("#lineChart2")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -54,6 +54,19 @@ d3.csv("weather.csv").then(data => {
     // ==========================================
     //         CHART 2 (if applicable)
     // ==========================================
+
+    // Load data
+    d3.csv("pivot_table.csv").then(data => {
+        // 2.b: TRANSFORM DATA
+    
+        data.forEach(d => {
+            d.record_max_temp_year = d3.timeParse("%Y")(d.record_max_temp_year); // Assuming it's in 'YYYY' format
+            d.count_record_max_temp_year = +d.count_record_max_temp_year; // Convert count to a number
+        });
+
+        console.log(data);
+    
+    });
 
     // 3.b: SET SCALES FOR CHART 2
 
