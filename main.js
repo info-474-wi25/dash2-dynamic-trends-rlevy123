@@ -11,7 +11,7 @@ const svgRon = d3.select("#lineChart1") // If you change this ID, you must chang
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-const svg2_RENAME = d3.select("#lineChart2")
+const svgElianna = d3.select("#lineChart2")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -78,7 +78,7 @@ d3.csv("weather.csv").then(data => {
         cityData.sort((a, b) => a.date - b.date); // Ensure data is in order
 
     svgRon.append("path")
-        .datum(dataArray)
+        .datum(cityData)
         .attr("fill", "none")
         .attr("stroke", color(city))
         .attr("stroke-width", 2)
@@ -107,27 +107,70 @@ d3.csv("weather.csv").then(data => {
         .attr("text-anchor", "middle")
         .text("Temperature (F)");
 
-        
-  
 
     // 7.a: ADD INTERACTIVITY FOR CHART 1
     
     // ==========================================
     //         CHART 2 (if applicable)
     // ==========================================
+    d3.csv("pivot_table.csv").then(data => {
+        // Clean column names (fixing spaces in column names)
+        data.forEach(d => {
+            d.count_record_max_temp_year = +d["COUNT of record_max_temp_year"] || 0; // Convert count to number
+        });
+    
+        // Remove empty records
+        data = data.filter(d => d.record_max_temp_year !== "");
+    
+        // Parse year
+        const parseYear = d3.timeParse("%Y");
+        data.forEach(d => {
+            d.record_max_temp_year = parseYear(d.record_max_temp_year);
+        });
+        
+        // 3.b: SET SCALES FOR CHART 2
+        const xScale2 = d3.scaleTime()
+            .domain(d3.extent(data, d => d.record_max_temp_year))
+            .range([0, width]);
+    
+        const yScale2 = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.count_record_max_temp_year)])
+            .range([height + 3, 0]);
+    
+        // 4.b: PLOT DATA FOR CHART 2
+        const line2 = d3.line()
+            .x(d => xScale2(d.record_max_temp_year))
+            .y(d => yScale2(d.count_record_max_temp_year));
+    
+        svgElianna.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2)
+            .attr("d", line2);
+    
+        // 5.b: ADD AXES FOR CHART 2
+        svgElianna.append("g")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(xScale2).tickFormat(d3.timeFormat("%Y")));
+        
+        svgElianna.append("g")
+            .call(d3.axisLeft(yScale2));
+    
+        // 6.b ADD LABELS FOR CHART 2
+        svgElianna.append("text")
+            .attr("transform", `translate(${width / 2}, ${height + 40})`)
+            .style("text-anchor", "middle")
+            .text("Year");
+    
+        svgElianna.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - 40)
+            .attr("x", 0 - (height / 2))
+            .style("text-anchor", "middle")
+            .text("Number of Record High Temps");
 
-    // 3.b: SET SCALES FOR CHART 2
+         // 7.b: ADD INTERACTIVITY FOR CHART 2
 
-
-    // 4.b: PLOT DATA FOR CHART 2
-
-
-    // 5.b: ADD AXES FOR CHART 2
-
-
-    // 6.b: ADD LABELS FOR CHART 2
-
-
-    // 7.b: ADD INTERACTIVITY FOR CHART 2
-
+    });
 });
