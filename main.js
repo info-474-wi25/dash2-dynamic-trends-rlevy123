@@ -63,26 +63,28 @@ d3.csv("weather.csv").then(data => {
     //used chat cause I was unable to figure out why my code wasnt working
     const formattedData = new Map();
 
-    citiesRollup.forEach((cityMap, date) => {
-        cityMap.forEach((temps, city) => {
-            if (!formattedData.has(city)) {
-                formattedData.set(city, []);
-            }
-            formattedData.get(city).push({ date: date, actual_mean_temp: temps[0] }); // Take first temperature
-        });
+citiesRollup.forEach((cityMap, date) => {
+    cityMap.forEach((temps, city) => {
+        if (!formattedData.has(city)) {
+            formattedData.set(city, []);
+        }
+        formattedData.get(city).push({ date: date, actual_mean_temp: temps[0] }); // Take first temperature
     });
+});
 
-    // Convert to array for D3 processing
-    const dataArray = Array.from(formattedData.entries());
-    dataArray.forEach(([city, cityData]) => {
-        cityData.sort((a, b) => a.date - b.date); // Ensure data is in order
+// Convert to array for D3 processing
+const dataArray = Array.from(formattedData.entries());
+dataArray.forEach(([city, cityData]) => {
+    cityData.sort((a, b) => a.date - b.date); // Ensure data is in order
 
     svgRon.append("path")
         .datum(cityData)
         .attr("fill", "none")
         .attr("stroke", color(city))
         .attr("stroke-width", 2)
-        .attr("d", line)});
+        .attr("d", line)
+        .attr("data-city", city); // Tag each path with its city
+});
     
     // 5.a: ADD AXES FOR CHART 1
     svgRon.append("g")
@@ -109,7 +111,40 @@ d3.csv("weather.csv").then(data => {
 
 
     // 7.a: ADD INTERACTIVITY FOR CHART 1
-    
+    //add interactive filter for each city so i can choose what city is showing
+
+    const filterWidget = d3.select("#widget1")
+    .append("select")
+    .attr("id", "cityFilter")
+    .attr("multiple", "")  // allow multiple selection
+    .on("change", function() {
+        const selectedCities = Array.from(this.selectedOptions)
+                                   .map(opt => opt.value);
+
+        // If "All" is selected or nothing is selected, show all paths, else filter by city.
+        if (selectedCities.includes("All") || selectedCities.length === 0) {
+            svgRon.selectAll("path[data-city]").style("display", null);
+        } else {
+            svgRon.selectAll("path[data-city]")
+                .style("display", function() {
+                    const city = d3.select(this).attr("data-city");
+                    return selectedCities.includes(city) ? null : "none";
+                });
+        }
+    });
+
+    // Populate the select element with options
+    filterWidget.append("option")
+        .attr("value", "All")
+        .text("All");
+
+    Array.from(cities.keys()).forEach(city => {
+        filterWidget.append("option")
+            .attr("value", city)
+            .text(city);
+    });
+
+
     // ==========================================
     //         CHART 2 (if applicable)
     // ==========================================
