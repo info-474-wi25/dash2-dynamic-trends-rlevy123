@@ -206,6 +206,54 @@ dataArray.forEach(([city, cityData]) => {
             .text("Number of Record High Temps");
 
          // 7.b: ADD INTERACTIVITY FOR CHART 2
+        // Trendline: Linear Regression
+        function linearRegression(data) {
+            const n = data.length;
+            const sumX = d3.sum(data, d => d.record_max_temp_year.getFullYear());
+            const sumY = d3.sum(data, d => d.count_record_max_temp_year);
+            const sumXY = d3.sum(data, d => d.record_max_temp_year.getFullYear() * d.count_record_max_temp_year);
+            const sumX2 = d3.sum(data, d => d.record_max_temp_year.getFullYear() * d.record_max_temp_year.getFullYear());
+
+            // Calculate slope and intercept
+            const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b = (sumY - m * sumX) / n;
+
+            // Generate points for the trendline
+            const trendlineData = data.map(d => ({
+                record_max_temp_year: d.record_max_temp_year,
+                count_record_max_temp_year: m * d.record_max_temp_year.getFullYear() + b
+            }));
+
+            return trendlineData;
+        }
+
+        // Draw Trendline
+        function drawTrendline() {
+            const trendlineData = linearRegression(data);
+
+            // Draw the trendline
+            svgElianna.append("path")
+                .data([trendlineData])
+                .attr("class", "trendline")
+                .attr("d", d3.line()
+                    .x(d => xScale2(d.record_max_temp_year))
+                    .y(d => yScale2(d.count_record_max_temp_year))
+                )
+                .attr("fill", "none")
+                .attr("stroke", "gray")
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "5,5");
+        }
+
+        // Event listener for trendline toggle
+        d3.select("#trendline-toggle").on("change", function() {
+            const isChecked = d3.select(this).property("checked");
+            if (isChecked) {
+                drawTrendline();
+            } else {
+                svgElianna.selectAll(".trendline").remove();
+            }
+        });
 
     });
 });
