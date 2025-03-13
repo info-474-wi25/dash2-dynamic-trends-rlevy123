@@ -6,6 +6,19 @@
     <title>Design Challenge 3</title>
     <script src="https://d3js.org/d3.v7.min.js"></script> <!-- Load D3 library -->
     <link rel="stylesheet" href="style.css"> <!-- Connect to style.css for styles -->
+    <style>
+        .tooltip {
+          position: absolute;
+          text-align: center;
+          padding: 8px;
+          font: 18px sans-serif;
+          background: rgba(0, 0, 0, 0.7);
+          color: #fff;
+          border-radius: 4px;
+          pointer-events: none;
+          z-index: 10;
+        }
+      </style>
 </head>
 <body class="vertical-container">
     <!-- HEADER -->
@@ -29,7 +42,7 @@
 
     <!-- CHART(S) -->
     <div class="item chart-container">
-        <h2>Average Temp Per City (2014-2015)</h2>
+        <h2>Average Temp Per City With Tooltip (2014-2015)</h2>
         <div class="chart-with-filter">
             <svg id="lineChart1" width="900" height="400"></svg> <!-- If you change this ID name, you must change it in main.js too -->
             </div>

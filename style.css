@@ -134,4 +134,18 @@ a:hover {
     }
 }
 
+<style>
+  .tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 8px;
+    font: 12px sans-serif;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 10;
+  }
+</style>
+
 /* CSS generated with assistance from ChatGPT and DeepSeek. */

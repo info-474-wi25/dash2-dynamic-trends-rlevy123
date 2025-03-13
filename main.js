@@ -19,7 +19,11 @@ const svgElianna = d3.select("#lineChart2")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
 // (If applicable) Tooltip element for interactivity
-// const tooltip = ...
+const tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
 
 // 2.a: LOAD...
 d3.csv("weather.csv").then(data => {
@@ -85,7 +89,25 @@ dataArray.forEach(([city, cityData]) => {
         .attr("d", line)
         .attr("data-city", city); // Tag each path with its city
 });
-    
+svgRon.selectAll("path[data-city]")
+        .on("mouseover", function(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 0.9);
+            tooltip.html("City: " + d3.select(this).attr("data-city"))
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mousemove", function(event, d) {
+            tooltip.style("left", (event.pageX + 10) + "px")
+                   .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
     // 5.a: ADD AXES FOR CHART 1
     svgRon.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -111,15 +133,13 @@ dataArray.forEach(([city, cityData]) => {
 
 
     // 7.a: ADD INTERACTIVITY FOR CHART 1
-    //add interactive filter for each city so i can choose what city is showing
-
     const filterWidget = d3.select("#widget1")
     .append("select")
     .attr("id", "cityFilter")
     .attr("multiple", "")  // allow multiple selection
     .on("change", function() {
         const selectedCities = Array.from(this.selectedOptions)
-                                   .map(opt => opt.value);
+            .map(opt => opt.value);
 
         // If "All" is selected or nothing is selected, show all paths, else filter by city.
         if (selectedCities.includes("All") || selectedCities.length === 0) {
@@ -143,7 +163,6 @@ dataArray.forEach(([city, cityData]) => {
             .attr("value", city)
             .text(city);
     });
-
 
     // ==========================================
     //         CHART 2 (if applicable)
